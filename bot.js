@@ -29,13 +29,15 @@ var komendy =
 
 var cytaty =['Brak'];
 
-let timer,ship,ship_name,ship_img,ship_rarity;
+let timer,ship,ship_name,ship_img,ship_rarity,ship_type;
 var r_color;
 
+var type=['CL','CA','DD','CV','CVL','BB','BC','BV','SS','AR'];
 var rarity=['Decisive','Ultra Rare','Priority','Super Rare','Elite','Rare','Normal'];
 var rarity_color=['0xff009d','0xffee00','0xbc42f5','0x42e3f5','0xd4d4d4'];
 
 //Light craft
+{
 var timer_light=['0:17:00','0:19:00','0:20:00','0:21:00','0:23:00','0:24:00','0:25:00'];
 var light_017=['Shirakami_Fubuki'];
 var light_017R=[rarity[3]];
@@ -53,12 +55,18 @@ var light_025=['Kawakaze','Grenville','Maury','Ariake','Hatsuharu','Wakaba','Yuu
 var light_025R=[rarity[3],rarity[4],rarity[4],rarity[5],rarity[5],rarity[5],rarity[5],rarity[6],rarity[6],];
 var light_115=['St.Louis'];
 var light_115R=[rarity[4]];
+}
 
 //Heavy craft
+{
 var timer_heavy=['1:15:00'];
-var heavy_115=['St. Louis'];
+var heavy_115=['St.Louis'];
+var heavy_115R=[rarity[4]];
+var heavy_115T=[type[0]];
+}
 
 //Special craft
+{
 var timer_special=['0:11:00','0:12:00','0:13:00','0:20:00','0:24:00','0:30:00','0:34:00','0:35:00','2:00:00','2:10:00','2:15:00','2:20:00','2:22:00','2:30:00','2:40:00','2:47:00','3:00:00','3:40:00','3:50:00',"4:00:00"];
 var special_11=['U-47','U-110','U-552','U-73'];
 var special_11R=[rarity[3],rarity[4],rarity[4],rarity[4]];
@@ -100,11 +108,13 @@ var special_350=['Glorious'];
 var special_350R=[rarity[4]];
 var special_400=['Ark_Royal'];
 var special_400R=[rarity[4]];
+}
 
 // Oczekiwanie na wiadomość
 
 function lightcraft(){
   timer=(Math.floor(Math.random() * timer_light.length-1)+1);
+  ship=null;
     switch(timer){
     case 0: 
             ship=Math.floor(Math.random() * light_017.length);
@@ -148,19 +158,23 @@ function lightcraft(){
 }
 
 function heavycraft(){
+  ship=null;
   timer=(Math.floor(Math.random() * timer_heavy.length-1)+1);
     switch(timer){
     case 0: 
             ship=Math.floor(Math.random() * heavy_115.length);
             ship_name=heavy_115[ship];
+            ship_rarity=heavy_115R[ship];
+            ship_type=heavy_115T[ship];
         break;
     }
     ship_img=ship_name+'.png';
-    console.log(timer+ship_name);
-    return timer, ship_name;
+    console.log(timer_heavy[timer]+ship_name);
+    return timer, ship_name,ship_rarity,ship_type;
 }
 
  function specialcraft(){
+  ship=null;
     timer=(Math.floor(Math.random() * timer_special.length-1)+1);
     console.log(timer);
     switch(timer){
@@ -254,18 +268,15 @@ function heavycraft(){
    return r_color;
  }
 
-function img(){
-    rng = Math.floor(Math.random() * 31);
-    rng=rng+'.jpg';
-//    console.log(rng);
-    return rng;
-}
+
 bot.on('message', msg => {
     if(commandIs("help",msg)){
-      msg.channel.send(komendy)}
+      msg.channel.send(komendy)
+    }
 
     if(commandIs("quote",msg)){
-      msg.channel.send((cytaty[Math.floor(Math.random() * cytaty.length-1)]));}
+      msg.channel.send((cytaty[Math.floor(Math.random() * cytaty.length-1)]));
+    }
 
     if(commandIs("avatar",msg)){
       const avatar= new MessageAttachment(msg.author.avatarURL());
@@ -277,7 +288,8 @@ bot.on('message', msg => {
         if(args.length === 1) {
         msg.reply('Nie uzyles komendy poprawnie! ``Poprawna skladnia to: *say [argument]``')}
         else{
-        msg.channel.send(args.join(" ").substring(5));}}
+        msg.channel.send(args.join(" ").substring(5));}
+      }
 
     if(commandIs("light",msg)){
         console.log("Craft");
@@ -302,7 +314,21 @@ bot.on('message', msg => {
     if(commandIs("heavy",msg)){
           console.log("Craft");
           heavycraft();
-          msg.channel.send("Timer: "+timer_heavy[timer]+" Nazwa statku: "+ship_name);}
+          const attach='./img/ships/'+ship_img; // Sciezka do pliku
+          const image='attachment://'+ship_img; // "Link" do pliku
+          color(ship_rarity);
+        const embed = new MessageEmbed()
+          .setTitle(ship_name)
+          .setDescription('Timer: ' + timer_heavy[timer])
+          .addField('Rarity', ship_rarity, true)
+          .addField('Type', ship_type, true)
+          .setColor(r_color)
+          .attachFiles([attach])
+          .setImage(image)
+          .setFooter('Moskas','https://moskas.github.io/IMG/icon.png')
+          .setTimestamp();
+          msg.channel.send(embed);
+    }
 
     if(commandIs("special",msg)){
             specialcraft(timer,ship);
@@ -319,6 +345,106 @@ bot.on('message', msg => {
             .setFooter('Moskas','https://moskas.github.io/IMG/icon.png')
             .setTimestamp();
             msg.channel.send(embed);
+    }
+
+    if(commandIs("pr3",msg)){
+      let args = msg.content.split(/[ ]+/);
+      if(args.length === 1) {
+        msg.reply('Nie ma takiego statku')}
+        else{
+          var pr3_ship=args.join(" ").substring(5);
+//          console.log(pr3_ship);
+          switch(pr3_ship){
+            case 'Cheshire':{
+              const attach='./img/ships/Cheshire.png'; // Sciezka do pliku
+              const image='attachment://Cheshire.png' // "Link" do pliku
+            const embed = new MessageEmbed()
+              .setTitle('HMS Cheshire')
+              .setURL('https://azurlane.koumakan.jp/Cheshire')
+              .setDescription('Meow')
+              .addField('Rarity', 'Priority', true)
+              .addField('Type', type[1],true)
+              .setColor('0xffee00')
+              .addFields(
+                { name: '\u200B',value: 'Stats:'},
+                { name: 'HP', value: '5141', inline: true },
+                { name: 'FP', value: '282', inline: true },
+                { name: 'AA', value: '409', inline: true },
+                { name: 'TP', value: '208', inline: true },
+                { name: 'EVA', value: '276', inline: true },
+                { name: 'SPD', value: '27', inline: true },
+                { name: 'ACC', value: '130', inline: true },
+                { name: 'RLD', value: '156', inline: true },
+                { name: 'LCK', value: '0', inline: true },
+              )
+              .attachFiles([attach])
+              .setThumbnail('https://azurlane.koumakan.jp/w/images/2/2e/CheshireChibi.png')
+              .setImage(image)
+              .setFooter('Moskas','https://moskas.github.io/IMG/icon.png')
+              .setTimestamp();
+              msg.channel.send(embed);
+            };break;
+            case 'Drake':{
+              const attach='./img/ships/Drake.png'; // Sciezka do pliku
+              const image='attachment://Drake.png' // "Link" do pliku
+            const embed = new MessageEmbed()
+              .setTitle('HMS Drake')
+              .setURL('https://azurlane.koumakan.jp/Drake')
+              .setDescription('Meow')
+              .addField('Rarity', 'Decisive', true)
+              .addField('Type', type[1],true)
+              .setColor(0xff009d)
+              .addFields(
+                { name: '\u200B',value: 'Stats:'},
+                { name: 'HP', value: '5668', inline: true },
+                { name: 'FP', value: '289', inline: true },
+                { name: 'AA', value: '289', inline: true },
+                { name: 'TP', value: '245', inline: true },
+                { name: 'EVA', value: '75', inline: true },
+                { name: 'SPD', value: '26', inline: true },
+                { name: 'ACC', value: '145', inline: true },
+                { name: 'RLD', value: '139', inline: true },
+                { name: 'LCK', value: '0', inline: true },
+              )
+              .attachFiles([attach])
+              .setThumbnail('https://azurlane.koumakan.jp/w/images/9/93/DrakeChibi.png')
+              .setImage(image)
+              .setFooter('Moskas','https://moskas.github.io/IMG/icon.png')
+              .setTimestamp();
+              msg.channel.send(embed);
+            };break;
+            case 'Odin':{
+              const attach='./img/ships/Odin.png'; // Sciezka do pliku
+              const image='attachment://Odin.png' // "Link" do pliku
+            const embed = new MessageEmbed()
+              .setTitle('KMS Odin')
+              .setURL('https://azurlane.koumakan.jp/Odin')
+              .setDescription('Meow')
+              .addField('Rarity', 'Priority', true)
+              .addField('Type', type[6],true)
+              .setColor('0xffee00')
+              .addFields(
+                { name: '\u200B',value: 'Stats:'},
+                { name: 'HP', value: '7126', inline: true },
+                { name: 'FP', value: '361', inline: true },
+                { name: 'AA', value: '337', inline: true },
+                { name: 'TP', value: '241', inline: true },
+                { name: 'EVA', value: '36', inline: true },
+                { name: 'SPD', value: '30', inline: true },
+                { name: 'ACC', value: '62', inline: true },
+                { name: 'RLD', value: '171', inline: true },
+                { name: 'LCK', value: '0', inline: true },
+              )
+              .attachFiles([attach])
+              .setThumbnail('https://azurlane.koumakan.jp/w/images/9/9c/OdinChibi.png')
+              .setImage(image)
+              .setFooter('Moskas','https://moskas.github.io/IMG/icon.png')
+              .setTimestamp();
+              msg.channel.send(embed);
+            };break;
+            default:msg.reply('Nie ma takiego statku');break;
+          }
+        }
     }
 });
 
