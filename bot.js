@@ -503,4 +503,4 @@ bot.on('message', msg => {
     }
 });
 
-bot.login('MjkxNzM1ODk1OTg2NDA1Mzg2.DwJvCw.-SdgncOc0J4dzphthRb_pkMJ0ZE');
+bot.login('authkey');
