@@ -3,24 +3,17 @@ const bot = require ('discord.js');
 const { MessageAttachment, MessageEmbed } = require('discord.js');
 const client = new bot.Client();
 const fs = require('fs');
-
-
-// Ustawianie prefiksu do komend
-// Setting up prefix for commands
-var pre = '*';
-function commandIs(str,msg){
-return msg.content.startsWith(pre + str);
-}
+const { config } = require('process');
 
 // Kolory rzadkości statkow
 // ENUM with ship rarity colors
 let rarity=""; // Zmienna dla switcha
 const color = {
- N :"0xd4d4d4",
- R :"0x42e3f5",
- E :"0xbc42f5",
- SR :"0xffee00",
- UR :"0xff009d",
+ N :"0xd4d4d4", // White 
+ R :"0x42e3f5", // Blue
+ E :"0xbc42f5", // Purple
+ SR :"0xffee00", // Yellow
+ UR :"0xff009d", // Pink
 }
 
 // Wczytanie JSON'a ze wszystkimi statystykami statków
@@ -32,6 +25,15 @@ fs.readFile('./json/ships.json', 'utf8', function (err,data) {
 		    }
 	  shipfus = data;
 	return shipfus;
+});
+
+let config_json;
+fs.readFile('./json/config.json', 'utf8', function (err,data) {
+	  if (err) {
+		      return console.log(err);
+		    }
+	  config_json = data;
+	return config_json;
 });
 
 // Funkcja podawania czasu (uzywana przy logowaniu)
@@ -48,9 +50,18 @@ client.on('ready', () => {
 	czas();
 	console.log('Polaczono pomyslnie jako Kitty '+ godzina+')'); // Informacja o połączeniu
 	obj = JSON.parse(shipfus); // Wczytywanie JSON
+	cfg = JSON.parse(config_json);
 	console.log(obj.ships[login].id+" "+obj.ships[login].type+" "+obj.ships[login].name);
-	client.user.setActivity('Termux'); // Ustawienie aktywności bota
+	client.user.setActivity(cfg.config[0].activity); // Ustawienie aktywności bota
 });
+
+
+// Ustawianie prefiksu do komend
+// Setting up prefix for commands
+var pre;
+function commandIs(str,msg){
+return msg.content.startsWith(cfg.config[0].prefix + str);
+}
 
 // Pętla wyczekująca wiadomości na czacie
 // Loop for catching new messages in chat
@@ -353,31 +364,4 @@ if(commandIs("compare",msg)){
 
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-client.login('key');
+client.login('auth key');
