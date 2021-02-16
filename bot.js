@@ -229,7 +229,7 @@ if(commandIs("compare",msg)){
 	console.log("porownanie statkow");
 	comp=msg.content.split(/[ ]+/);
 	comp = comp.join(" ").substring(9);
-	comp=comp.split(/[ ]+/);
+	comp=comp.split(/[|]+/);
 	console.log(comp);
 	for(i in obj.ships){
 		if(comp[0]===obj.ships[i].name)
@@ -380,4 +380,4 @@ if(commandIs("compare",msg)){
 
 
 
-client.login('login key');
+client.login('key');
