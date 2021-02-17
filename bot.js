@@ -28,7 +28,7 @@ fs.readFile('./json/ships.json', 'utf8', function (err,data) {
 });
 
 let config_json;
-fs.readFile('./json/config.json', 'utf8', function (err,data) {
+fs.readFile('./config/config.json', 'utf8', function (err,data) {
 	  if (err) {
 		      return console.log(err);
 		    }
@@ -58,7 +58,6 @@ client.on('ready', () => {
 
 // Ustawianie prefiksu do komend
 // Setting up prefix for commands
-var pre;
 function commandIs(str,msg){
 return msg.content.startsWith(cfg.config[0].prefix + str);
 }
@@ -92,18 +91,7 @@ client.on('message', msg  => {
 	 else
 	 msg.channel.send("Nie znaleziono pasującego statku");
  }
-/*
- if(commandIs("nations",msg)){
-	let nations = ["Eagle Union","Royal Navy","Sakura Empire","Iron Blood","Dragon Empery","Northern Parliment","Iris Libre","Vichya Dominion","Serdegna Empire","META"]; // Zrob json dla klarownosci
-	 for(i in obj.ships){
-		 // Switch z nacjami
-	 }
-	 console.log(nations);
- }
 
- if(commandIs("types",msg)){
- }
-*/
 
 // Podawanie losowego statku razem z grafika, nacja i typem statku razem z jego rzadkoscia
 // Sending message embed with information about searched ship including graphic of the ship
@@ -174,18 +162,7 @@ client.on('message', msg  => {
 		console.log(obj.ships[i]);
         msg.channel.send(embed);
 	found = true; //Oznaczenie ze znaleziono statek zeby nie wyswietlac blednie informacji o braku statku 
-		}// else {
-/*		let trafione =" | ";
-		let query = new RegExp(ship.toLowerCase(),"g");
-//			for(i in obj.ships){
-				if(obj.ships[i].name.toLowerCase().match(query))
-					trafione+=obj.ships[i].name+" | ";
-//			}
-			if(trafione!=" | "){
-				msg.channel.send('```'+trafione+'```');
-				found=true;
-			} else */
-		else {
+		} else {
 		 if(found === false){
 			 console.log("Nie znaleziono statku");
 		 	}
@@ -364,4 +341,4 @@ if(commandIs("compare",msg)){
 
 });
 
-client.login('auth key');
+client.login('key');
