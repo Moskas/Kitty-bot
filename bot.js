@@ -116,7 +116,7 @@ client.on('message', msg  => {
 			}
 		        const embed = new MessageEmbed()
 			.setTitle(obj.ships[i].name)
-			.setURL("https://azurlane.koumakan.jp/"+obj.ships[i].name)
+			.setURL("https://azurlane.koumakan.jp/"+obj.ships[i].name.replace(/ /g,"_").replace(/\_\(Retrofit\)/g,""))
 			.addFields(
 			{name:'Nation', value:obj.ships[i].nation , inline:true},
 			{name:'Type', value:obj.ships[i].type , inline:true}
@@ -150,7 +150,7 @@ client.on('message', msg  => {
 	}
 	const embed = new MessageEmbed()
 	   	.setTitle(obj.ships[i].name)
-		.setURL("https://azurlane.koumakan.jp/"+obj.ships[i].name.replace(/ /g,"_"))
+		.setURL("https://azurlane.koumakan.jp/"+obj.ships[i].name.replace(/ /g,"_").replace(/\_\(Retrofit\)/g,""))
 		.addFields(
 			{name:'Nation', value:obj.ships[i].nation , inline:true},
 			{name:'Type', value:obj.ships[i].type , inline:true}
@@ -192,7 +192,7 @@ if(commandIs("stats",msg)){
 			}
 	embed = new MessageEmbed()
 		.setTitle(obj.ships[i].type+" "+obj.ships[i].name+" Lvl 120")
-		.setURL("https://azurlane.koumakan.jp/"+obj.ships[i].name.replace(/ /g,"_"))
+		.setURL("https://azurlane.koumakan.jp/"+obj.ships[i].name.replace(/ /g,"_").replace(/\_\(Retrofit\)/g,""))
 		.addFields(
 			{name:'Defensive',value:"HP: "+obj.ships[i].hp+" Armor: "+obj.ships[i].armor+" Eva: "+obj.ships[i].eva+" Speed: "+obj.ships[i].spd},
 			{name:'Offensive',value:"FP: "+obj.ships[i].fp+" AA: "+obj.ships[i].aa+" Avi: "+obj.ships[i].avi+" Trp: "+obj.ships[i].trp+" Accuracy: "+obj.ships[i].acc+" Asw: "+obj.ships[i].asw},
