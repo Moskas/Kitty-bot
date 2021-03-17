@@ -1,9 +1,16 @@
 console.log("Uruchamianie...");
+// File reader
+const fs = require('fs');
+
+// Discord.js
 const bot = require ('discord.js');
 const { MessageAttachment, MessageEmbed } = require('discord.js');
 const client = new bot.Client();
-const fs = require('fs');
-const { config } = require('process');
+
+// Azur Lane API
+const { getEquipment, getShipByEnglishName, getShip, getEquipmentByEnglishName } = require('@azurapi/azurapi')
+const azurlane = require('@azurapi/azurapi');
+const { equal } = require('assert');
 
 // Kolory rzadkości statkow
 // ENUM with ship rarity colors
@@ -14,6 +21,19 @@ const color = {
  E :"0xbc42f5", // Purple
  SR :"0xffee00", // Yellow
  UR :"0xff009d", // Pink
+}
+
+function rarity_color(ship){
+	switch(getShipByEnglishName(ship).rarity){
+	case "Normal":rarity=color.N;break;
+	case "Rare":rarity=color.R;break;
+	case "Elite":rarity=color.E;break;
+	case "Super Rare":rarity=color.SR;break;
+	case "Priority":rarity=color.SR;break;
+	case "Ultra Rare":rarity=color.UR;break;
+	case "Decisive":rarity=color.UR;break;
+	}
+	return rarity;
 }
 
 // Wczytanie JSON'a ze wszystkimi statystykami statków
@@ -35,24 +55,34 @@ fs.readFile('./config/config.json', 'utf8', function (err,data) {
 	  config_json = data;
 	return config_json;
 });
+let language;
 
 // Funkcja podawania czasu (uzywana przy logowaniu)
 // Function for getting time (used when logging in)
-let godzina;
 function czas(){
-	godzina = new Date();
-	return godzina;
+	data_czas = new Date();
+	return data_czas;
 }
 
+function format(seconds){
+	function pad(s){
+	  return (s < 10 ? '0' : '') + s;
+	}
+	var hours = Math.floor(seconds / (60*60));
+	var minutes = Math.floor(seconds % (60*60) / 60);
+	var seconds = Math.floor(seconds % 60);
+  
+	return pad(hours) + ':' + pad(minutes) + ':' + pad(seconds);
+  }
+
+let uptime;
 // Czynności bota które są wykonywane po połączeniu z Discordem
 client.on('ready', () => {
-	var login = Math.floor(Math.random() * 539);
+//	var login = Math.floor(Math.random() * 539);
 	czas();
-	console.log('Polaczono pomyslnie jako Kitty '+ godzina+')'); // Informacja o połączeniu
+	console.log('Polaczono pomyslnie jako Kitty '+ data_czas +' '); // Informacja o połączeniu
 	obj = JSON.parse(shipfus); // Wczytywanie JSON
 	cfg = JSON.parse(config_json);
-	console.log(obj.ships[login].id+" "+obj.ships[login].type+" "+obj.ships[login].name);
-	client.user.setActivity(cfg.config[0].activity); // Ustawienie aktywności bota
 });
 
 
@@ -74,6 +104,14 @@ client.on('message', msg  => {
 	 .setColor("#FF0000") // Red
 	 .setImage(msg.author.avatarURL());
 	 msg.channel.send(embed);
+ }
+
+ if(commandIs("uptime",msg)){
+	uptime = process.uptime();
+	msg.channel.send(format(uptime));
+ }
+
+ if(commandIs("help",msg)){
  }
 
  // Wyszukiwanie pasujących statków do podanej frazy/znaku
@@ -210,6 +248,49 @@ if(found===false){
 	}
 }
 
+if(commandIs("wiki",msg)){
+		let ship = msg.content.split(/[ ]+/);
+		ship = ship.join(" ").substring(5);
+		msg.channel.send(getShipByEnglishName(ship).wikiUrl);
+}
+
+if(commandIs("alship",msg)){
+	let ship = msg.content.split(/[ ]+/);
+	ship = ship.join(" ").substring(8);
+	if(getShipByEnglishName(ship)!=undefined){
+	rarity_color(ship);
+	const embed = new MessageEmbed()
+	   	.setTitle(getShipByEnglishName(ship).names.en)
+		.setURL(getShipByEnglishName(ship).wikiUrl)
+		.addFields(
+			{name:'Nation', value:getShipByEnglishName(ship).nationality , inline:true},
+			{name:'Type', value:getShipByEnglishName(ship).hullType , inline:true}
+		)
+		.setColor(rarity)
+		.setImage(getShipByEnglishName(ship).skins[0].image)
+		.setTimestamp();
+        msg.channel.send(embed);
+	}
+}
+
+if(commandIs("eq",msg)){
+
+	let eq = msg.content.split(/[ ]+/);
+	eq = eq.join(" ").substring(4);
+	console.log(eq);
+	const embed = new MessageEmbed()
+	   	.setTitle(getEquipmentByEnglishName(eq).names.en)
+		.setURL(getEquipmentByEnglishName(eq).wikiUrl)
+		.addFields(
+			{name:'Nation', value:getEquipmentByEnglishName(eq).nationality , inline:true},
+			{name:'Fit', value:getEquipmentByEnglishName(eq).type.name , inline:true}
+		)
+		.setThumbnail(getEquipmentByEnglishName(eq).image)
+		.setTimestamp();
+
+		msg.channel.send(embed);
+}
+
 // Porównianie statystyk dwóch podanych statków
 // Compare stats of two ships
 if(commandIs("compare",msg)){
@@ -226,7 +307,7 @@ if(commandIs("compare",msg)){
 			ship[1]=i;
 	}
 	console.log(ship);
-//Porownywanie
+//		Porownywanie
 	let sign = [,,,,,,,,,,,,,];
  	switch(true){
 //		Firepower			
@@ -339,6 +420,23 @@ if(commandIs("compare",msg)){
 	        msg.channel.send(embed);
 	}
 
+		
+	if(commandIs("alcompare",msg)){
+		let comp,ship=[0,0];
+		console.log("porownanie statkow");
+		comp=msg.content.split(/[ ]+/);
+		comp = comp.join(" ").substring(11);
+		comp=comp.split(/[|]+/);
+		console.log(comp);
+
+		ship[0]= getShipByEnglishName(comp[0]);
+		ship[1]= getShipByEnglishName(comp[1]);
+
+		msg.channel.send(ship);
+	}
+
 });
 
+
 client.login('key');
+client.on("error", () => { client.login('key') });
